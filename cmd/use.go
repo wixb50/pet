@@ -31,7 +31,14 @@ func use(cmd *cobra.Command, args []string) (err error) {
 		if err != nil {
 			return err
 		}
+		if len(allFiles) == 0 {
+			fmt.Print("\n")
+			return nil
+		}
 		useFile = allFiles[0]
+		if len(useFile) == 0 {
+			return nil
+		}
 	}
 
 	if err := config.Conf.Switch(useFile); err != nil {

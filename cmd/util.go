@@ -50,7 +50,7 @@ func filterSnippetFile(options []string) (lines []string, err error) {
 			if f.IsDir() {
 				return nil
 			}
-			text += path + "\n"
+			text += f.Name() + "\n"
 			return nil
 		})
 

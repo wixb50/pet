@@ -89,7 +89,7 @@ func (cfg *Config) Load(file string) error {
 
 func (cfg *Config) Switch(snippetFile string) error {
 	dir, _ := GetDefaultConfigDir()
-	cfg.General.SnippetFile = filepath.Join(dir, "data", snippetFile+".toml")
+	cfg.General.SnippetFile = filepath.Join(dir, "data", snippetFile)
 
 	_, err := os.Stat(cfg.General.SnippetFile)
 	if err != nil {
