@@ -17,7 +17,7 @@ var Conf Config
 // Config is a struct of config
 type Config struct {
 	General GeneralConfig
-	Gist    GistConfig
+	AliOSS  AliOSSConfig
 }
 
 type GeneralConfig struct {
@@ -27,12 +27,12 @@ type GeneralConfig struct {
 	SelectCmd   string `toml:"selectcmd"`
 }
 
-type GistConfig struct {
-	FileName    string `toml:"file_name"`
-	AccessToken string `toml:"access_token"`
-	GistID      string `toml:"gist_id"`
-	Public      bool   `toml:"public"`
-	AutoSync    bool   `toml:"auto_sync"`
+type AliOSSConfig struct {
+	AccessID   string `toml:"access_id"`
+	AccessKey  string `toml:"access_key"`
+	BucketName string `toml:"bucket_name"`
+	Endpoint   string `toml:"endpoint"`
+	AutoSync   bool   `toml:"auto_sync"`
 }
 
 // Flag is global flag variable
@@ -81,8 +81,6 @@ func (cfg *Config) Load(file string) error {
 	}
 	cfg.General.Column = 40
 	cfg.General.SelectCmd = "fzf"
-
-	cfg.Gist.FileName = "pet-snippet.toml"
 
 	return toml.NewEncoder(f).Encode(cfg)
 }

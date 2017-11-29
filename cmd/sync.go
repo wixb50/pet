@@ -17,10 +17,16 @@ var syncCmd = &cobra.Command{
 }
 
 func sync(cmd *cobra.Command, args []string) (err error) {
-	if config.Conf.Gist.AccessToken == "" {
-		return fmt.Errorf(`access_token is empty.
-Go https://github.com/settings/tokens/new and create access_token (only need "gist" scope).
-Write access_token in config file (pet configure).
+	if config.Conf.AliOSS.AccessID == "" || config.Conf.AliOSS.AccessKey == "" {
+		return fmt.Errorf(`access_id or access_key is empty.
+Go https://oss.console.aliyun.com/index and create access_id or access_key (only need "AliOSS" scope).
+Write access_id or access_key in config file (pet configure).
+		`)
+	}
+	if config.Conf.AliOSS.BucketName == "" || config.Conf.AliOSS.Endpoint == "" {
+		return fmt.Errorf(`bucket_name or endpoint is empty.
+Go https://oss.console.aliyun.com/index and create bucket_name or endpoint (only need "AliOSS" scope).
+Write bucket_name or endpoint in config file (pet configure).
 		`)
 	}
 

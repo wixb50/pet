@@ -36,7 +36,7 @@ func edit(cmd *cobra.Command, args []string) (err error) {
 		return nil
 	}
 
-	if config.Conf.Gist.AutoSync {
+	if config.Conf.AliOSS.AutoSync {
 		return petSync.AutoSync(snippetFile)
 	}
 
