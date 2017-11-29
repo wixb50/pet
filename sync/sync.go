@@ -86,7 +86,7 @@ func upload() (err error) {
 	}
 
 	client := aliOSSClient()
-	err = client.PutObjectFromFile(snippetFile, snippetName)
+	err = client.PutObjectFromFile(snippetName, snippetFile)
 	if err != nil {
 		return errors.Wrapf(err, "%s upload error", snippetName)
 	}
@@ -99,7 +99,7 @@ func download() error {
 	var snippetName = filepath.Base(snippetFile)
 
 	client := aliOSSClient()
-	err := client.GetObjectToFile(snippetFile, snippetFile)
+	err := client.GetObjectToFile(snippetName, snippetFile)
 	if err != nil {
 		return errors.Wrapf(err, "%s download error", snippetName)
 	}

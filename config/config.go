@@ -80,7 +80,7 @@ func (cfg *Config) Load(file string) error {
 		cfg.General.Editor = "vim"
 	}
 	cfg.General.Column = 40
-	cfg.General.SelectCmd = "fzf"
+	cfg.General.SelectCmd = "peco"
 
 	return toml.NewEncoder(f).Encode(cfg)
 }
