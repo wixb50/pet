@@ -23,7 +23,7 @@ func AutoSync(file string) error {
 	}
 	lastModified, ok := ossMeta["Last-Modified"]
 	if !ok {
-		return upload()
+		return upload(ok)
 	}
 
 	fi, err := os.Stat(file)
@@ -41,7 +41,7 @@ func AutoSync(file string) error {
 
 	switch {
 	case local.After(remote):
-		return upload()
+		return upload(ok)
 	case remote.After(local):
 		return download()
 	default:
@@ -67,7 +67,7 @@ func getObjectMeta(file string) (http.Header, error) {
 	return props, nil
 }
 
-func upload() (err error) {
+func upload(remoteExist bool) (err error) {
 	var snippetFile = config.Conf.General.SnippetFile
 	var snippetName = filepath.Base(snippetFile)
 
@@ -81,6 +81,9 @@ func upload() (err error) {
 		return err
 	}
 	if len(body) == 0 {
+		if remoteExist {
+			return download()
+		}
 		fmt.Printf("%s is empty, skip sync\n", snippetName)
 		return nil
 	}
