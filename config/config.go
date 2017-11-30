@@ -43,6 +43,7 @@ type FlagConfig struct {
 	Debug     bool
 	Query     string
 	Delimiter string
+	Force     bool
 	OneLine   bool
 	Color     bool
 	Tag       bool

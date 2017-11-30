@@ -12,7 +12,7 @@ import (
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Sync snippets",
-	Long:  `Sync snippets with gist`,
+	Long:  `Sync snippets with alioss`,
 	RunE:  sync,
 }
 
@@ -30,9 +30,14 @@ Write bucket_name or endpoint in config file (pet configure).
 		`)
 	}
 
+	if config.Flag.Force {
+		return petSync.ForceSync()
+	}
 	return petSync.AutoSync(config.Conf.General.SnippetFile)
 }
 
 func init() {
 	RootCmd.AddCommand(syncCmd)
+	syncCmd.Flags().BoolVarP(&config.Flag.Force, "force", "f", false,
+		`Force sync remote snippets to local`)
 }

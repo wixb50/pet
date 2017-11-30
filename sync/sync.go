@@ -15,6 +15,32 @@ import (
 	"pet/snippet"
 )
 
+// Force Sync remote to local
+func ForceSync() error {
+	var snippetFile = config.Conf.General.SnippetFile
+	var snippetDir = filepath.Dir(snippetFile)
+
+	err := removeContents(snippetDir)
+	if err != nil {
+		return errors.Wrap(err, "Failed to clean local data dir")
+	}
+
+	objectKeys, err := listObjects()
+	if err != nil {
+		return err
+	}
+	for _, objectKey := range objectKeys {
+		config.Conf.General.SnippetFile = filepath.Join(snippetDir, objectKey)
+		err = AutoSync(config.Conf.General.SnippetFile)
+		if err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("Sync success")
+	return nil
+}
+
 // AutoSync syncs snippets automatically
 func AutoSync(file string) error {
 	ossMeta, err := getObjectMeta(file)
@@ -49,6 +75,24 @@ func AutoSync(file string) error {
 	}
 }
 
+func RemoveSync(file string) error {
+	var snippetName = filepath.Base(file)
+
+	err := os.Remove(file)
+	if err != nil && !os.IsNotExist(err) {
+		return errors.Wrap(err, "Failed to delete local file")
+	}
+
+	client := aliOSSClient()
+	err = client.DeleteObject(snippetName)
+	if err != nil {
+		return errors.Wrapf(err, "%s delete remote error", snippetName)
+	}
+
+	fmt.Println("Delete success")
+	return nil
+}
+
 func getObjectMeta(file string) (http.Header, error) {
 	s := spinner.New(spinner.CharSets[14], 100*time.Millisecond)
 	s.Start()
@@ -65,6 +109,19 @@ func getObjectMeta(file string) (http.Header, error) {
 		return nil, errors.Wrapf(err, "Failed to get object")
 	}
 	return props, nil
+}
+
+func listObjects() (objectKeys []string, err error) {
+	client := aliOSSClient()
+	lsRes, err := client.ListObjects()
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to list objects")
+	}
+
+	for _, object := range lsRes.Objects {
+		objectKeys = append(objectKeys, object.Key)
+	}
+	return objectKeys, nil
 }
 
 func upload(remoteExist bool) (err error) {
@@ -117,4 +174,23 @@ func aliOSSClient() *oss.Bucket {
 	)
 	bucket, _ := client.Bucket(config.Conf.AliOSS.BucketName)
 	return bucket
+}
+
+func removeContents(dir string) error {
+	d, err := os.Open(dir)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	names, err := d.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(dir, name))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
