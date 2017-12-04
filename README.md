@@ -1,64 +1,18 @@
-# pet : CLI Snippet Manager
+# pet-plus : CLI Snippet Manager
 
-[![GitHub release](https://img.shields.io/github/release/knqyf263/pet.svg)](https://github.com/knqyf263/pet/releases/latest)
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://github.com/knqyf263/pet/blob/master/LICENSE)
-
-<img src="doc/logo.png" width="150">
-
-Simple command-line snippet manager, written in Go
-
-<img src="doc/pet01.gif" width="700">
-
-You can use variables (`<param>` or `<param=default_value>` ) in snippets.
-
-<img src="doc/pet08.gif" width="700">
-
+Multi command-line snippet manager, written in Go.
 
 # Abstract
 
 `pet` is written in Go, and therefore you can just grab the binary releases and drop it in your $PATH.
 
-`pet` is a simple command-line snippet manager (inspired by [memo](https://github.com/mattn/memo)).
-I always forget commands that I rarely use. Moreover, it is difficult to search them from shell history. There are many similar commands, but they are all different.
+`pet` is a simple command-line snippet manager (base on [pet](https://github.com/knqyf263/pet)).
 
-e.g. 
-- `$ awk -F, 'NR <=2 {print $0}; NR >= 5 && NR <= 10 {print $0}' company.csv` (What I am looking for)
-- `$ awk -F, '$0 !~ "DNS|Protocol" {print $0}' packet.csv`
-- `$ awk -F, '{print $0} {if((NR-1) % 5 == 0) {print "----------"}}' test.csv`
+Support change work snippet, multi snippet manager.
 
-In the above case, I search by `awk` from shell history, but many commands hit.
+Add `use|rm` function to change work snippet.
 
-Even if I register an alias, I forget the name of alias (because I rarely use that command).
-
-So I made it possible to register snippets with description and search them easily.
-
-# TOC
-
-- [Main features](#main-features)
-- [Examples](#examples)
-    - [Register the previous command easily](#register-the-previous-command-easily)
-        - [bash/zsh](#bashzsh)
-        - [fish](#fish)
-    - [Select snippets at the current line (like C-r)](#select-snippets-at-the-current-line-like-c-r)
-        - [bash](#bash)
-        - [zsh](#zsh)
-        - [fish](#fish-1)
-    - [Copy snippets to clipboard](#copy-snippets-to-clipboard)
-- [Features](#features)
-    - [Edit snippets](#edit-snippets)
-    - [Sync snippets](#sync-snippets)
-- [Usage](#usage)
-- [Snippet](#snippet)
-- [Configuration](#configuration)
-    - [Selector option](#selector-option)
-    - [Tag](#tag)
-    - [Sync](#sync)
-- [Installation](#installation)
-    - [Binary](#binary)
-    - [Mac OS X / Homebrew](#mac-os-x--homebrew)
-    - [Archlinux](#archlinux)
-    - [Build](#build)
-- [Contribute](#contribute)
+Change Gist sync to AliyunOSS Bucket.
 
 # Main features
 `pet` has the following features.
@@ -68,7 +22,8 @@ So I made it possible to register snippets with description and search them easi
 - Search snippets interactively.
 - Run snippets directly.
 - Edit snippets easily (config is just a TOML file).
-- Sync snippets via Gist.
+- Multi snippets file management.
+- Sync snippets via AliyunOSS.
 
 # Examples
 Some examples are shown below.
@@ -87,8 +42,7 @@ function prev() {
 ```
 
 ### fish
-See below for details.  
-https://github.com/otms61/fish-pet
+See below for details.
 
 <img src="doc/pet02.gif" width="700">
 
@@ -122,8 +76,7 @@ bindkey '^s' pet-select
 ```
 
 ### fish
-See below for details.  
-https://github.com/otms61/fish-pet
+See below for details.
 
 <img src="doc/pet03.gif" width="700">
 
@@ -136,15 +89,22 @@ By using `pbcopy` on OS X, you can copy snippets to clipboard.
 # Features
 
 ## Edit snippets
-The snippets are managed in the TOML file, so it's easy to edit.
 
-<img src="doc/pet04.gif" width="700">
+```
+$ pet configure
+```
 
+## Change snippets
+
+```
+$ pet use [new_snippet_file_name.toml]
+```
 
 ## Sync snippets
-You can share snippets via Gist.
 
-<img src="doc/pet05.gif" width="700">
+```
+$ pet sync
+```
 
 
 # Usage
@@ -162,8 +122,10 @@ Available Commands:
   help        Help about any command
   list        Show all snippets
   new         Create a new snippet
+  rm          Remove current snippet
   search      Search snippets
   sync        Sync snippets
+  use         Change/Create the work snippet
   version     Print the version number
 
 Flags:
@@ -208,10 +170,11 @@ Run `pet configure`
   column = 40                     # column size for list command
   selectcmd = "peco"              # selector command for edit command (peco or fzf)
 
-[Gist]
-  file_name = "pet-snippet.toml"  # specify gist file name
-  access_token = ""               # your access token
-  gist_id = ""                    # Gist ID
+[AliOSS]
+  access_id = ""
+  access_key = ""
+  bucket_name = ""
+  endpoint = ""
 ```
 
 ## Selector option
@@ -262,21 +225,18 @@ $ pet search
 
 ## Sync
 You must obtain access token.
-Go https://github.com/settings/tokens/new and create access token (only need "gist" scope).
-Set that to `access_token` in `[Gist]`.
+Go https://oss.console.aliyun.com/index and create aliyun oss bucket, then set the configure (only need "AliOSS" scope).
+Set that to `access_id` 、`access_key` 、`bucket_name` 、`endpoint` in `[AliOSS]`.
 
-After setting, you can upload snippets to Gist.
+After setting, you can upload snippets to Aliyun OSS.
 ```
-$ pet sync -u
-Gist ID: 1cedddf4e06d1170bf0c5612fb31a758
+$ pet sync
 Upload success
 ```
 
-Set `Gist ID` to `gist_id` in `[Gist]`.
-
 You can download snippets on another PC.
 ```
-$ pet sync
+$ pet sync -f
 Download success
 ```
 
@@ -285,58 +245,18 @@ You need to install selector command ([fzf](https://github.com/junegunn/fzf) or 
 `homebrew` install `peco` automatically.
 
 ## Binary
-Go to [the releases page](https://github.com/knqyf263/pet/releases), find the version you want, and download the zip file. Unpack the zip file, and put the binary to somewhere you want (on UNIX-y systems, /usr/local/bin or the like). Make sure it has execution bits turned on. 
-
-## Mac OS X / Homebrew
-You can use homebrew on OS X.
-```
-$ brew install knqyf263/pet/pet
-```
-
-If you receive an error (`Error: knqyf263/pet/pet 64 already installed`) during `brew upgrade`, try the following command
-
-```
-$ brew unlink pet && brew uninstall pet
-($ rm -rf /usr/local/Cellar/pet/64)
-$ brew install knqyf263/pet/pet
-```
-
-## Archlinux
-Two packages are available in [AUR](https://wiki.archlinux.org/index.php/Arch_User_Repository).
-You can install the package [from source](https://aur.archlinux.org/packages/pet-git):
-```
-$ yaourt -S pet-git
-```
-Or [from the binary](https://aur.archlinux.org/packages/pet-bin):
-```
-$ yaourt -S pet-bin
-```
+Go to [the releases page](https://github.com/wixb50/pet/releases), find the version you want, and download the zip file. Unpack the zip file, and put the binary to somewhere you want (on UNIX-y systems, /usr/local/bin or the like). Make sure it has execution bits turned on. 
 
 ## Build
 
 ```
-$ mkdir -p $GOPATH/src/github.com/knqyf263
-$ cd $GOPATH/src/github.com/knqyf263
-$ git clone https://github.com/knqyf263/pet.git
+$ git clone https://github.com/wixb50/pet.git
 $ cd pet
 $ make install
 ```
-
-# Contribute
-
-1. fork a repository: github.com/knqyf263/pet to github.com/you/repo
-2. get original code: `go get github.com/knqyf263/pet`
-3. work on original code
-4. add remote to your repo: git remote add myfork https://github.com/you/repo.git
-5. push your changes: git push myfork
-6. create a new Pull Request
-
-- see [GitHub and Go: forking, pull requests, and go-getting](http://blog.campoy.cat/2014/03/github-and-go-forking-pull-requests-and.html)
-
-----
 
 # License
 MIT
 
 # Author
-Teppei Fukuda
+Elegance Tse

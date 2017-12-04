@@ -10,8 +10,8 @@ import (
 // useCmd represents the use command
 var useCmd = &cobra.Command{
 	Use:   "use",
-	Short: "Select the file edit",
-	Long:  `Select the file edit directly`,
+	Short: "Change/Create the work snippet",
+	Long:  `Change or Create the work snippet`,
 	RunE:  use,
 }
 

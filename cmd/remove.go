@@ -9,8 +9,8 @@ import (
 // syncCmd represents the sync command
 var removeCmd = &cobra.Command{
 	Use:   "rm",
-	Short: "Remove snippet",
-	Long:  `Remove snippet local and remote`,
+	Short: "Remove current snippet",
+	Long:  `Remove current snippet local and remote`,
 	RunE:  remove,
 }
 
